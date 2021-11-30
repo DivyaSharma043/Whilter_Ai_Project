@@ -1,0 +1,42 @@
+version: '3.7'
+
+networks:
+  jio_fabric_network:
+    name: jio_fabric_network
+
+services:
+    keycloak:
+      image: quay.io/keycloak/keycloak:latest
+      container_name: keycloak
+      networks:
+        - jio_fabric_network
+      environment:
+        DB_VENDOR: MYSQL
+        DB_ADDR: db
+        DB_DATABASE: keycloak
+        DB_USER: keycloak
+        DB_PASSWORD: password
+        KEYCLOAK_USER: admin
+        KEYCLOAK_PASSWORD: Pa55w0rd
+      ports:
+        - '3200:8080'
+      depends_on:
+        - db
+    db:
+      image: mysql:5.7
+      container_name: db
+      networks:
+        - jio_fabric_network
+      ports:
+        - "3306:3306"
+      volumes:
+        - mysql_data:/var/lib/mysql
+      restart: always
+      environment:
+        MYSQL_ROOT_PASSWORD: root
+        MYSQL_DATABASE: keycloak
+        MYSQL_USER: keycloak
+        MYSQL_PASSWORD: password
+volumes:
+  mysql_data:
+    driver: local
